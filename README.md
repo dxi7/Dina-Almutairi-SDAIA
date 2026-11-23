@@ -3,10 +3,15 @@ Tamweel | SDAIA
 ## Daily answers
 
 ### Day 1
-**Initial candidate: Logistic Regression.**
+**Initial Candidate:** LightGBM.
 
-**Strongest evidence:** On the 2,000 untouched comparison rows, Logistic Regression had the best ROC-AUC (0.821, against 0.812 for XGBoost and 0.814 for LightGBM) and a practically tied Average Precision (0.326 vs 0.334 and 0.325, with a 7.9% prevalence baseline). It also trained in 0.04 s versus 0.38 s (XGBoost) and 0.24 s (LightGBM). A paired bootstrap shows no clear statistical difference between the models (every 95% confidence interval for the difference versus Logistic Regression includes 0). Therefore, the boosters have not yet demonstrated a meaningful performance gain that justifies their extra complexity.
+**Strongest Evidence:** LightGBM achieved a ROC-AUC of 0.814 and Average Precision of 0.325, while training faster than XGBoost. The performance differences between models were not statistically significant, making LightGBM a practical initial choice.
 
-**Limitation:** This is one random split; 1,226 customers appear on both the development and comparison sides, and time is ignored, so the scores may be optimistic and the ranking may change under more robust validation.
+**Limitation & Next Step:** The evaluation used a single random split and did not account for customer overlap or time. Day 2 will use customer-grouped, time-ordered validation for a more reliable assessment.
 
-**Next test (Day 2):** Customer-grouped, time-ordered validation that respects target maturity.
+### Day 2
+**Leakage Risk:** The fields `days_past_due_60` and `collection_calls` contain post-application information, causing data leakage. Including them inflated AP to 0.9988, while removing them reduced it to 0.311.
+
+**Validation Design:** Removed leakage fields and duplicates, used three time-ordered folds with 90-day label maturity, and ensured no customer overlap. Imputation and tuning were restricted to training data.
+
+**Limitations:** The validation folds are relatively small, and tuning did not improve performance (AP 0.313 vs. 0.315). Results are not yet a final independent test.

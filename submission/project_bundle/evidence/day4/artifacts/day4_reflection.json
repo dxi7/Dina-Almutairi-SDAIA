@@ -1,0 +1,15 @@
+{
+  "responses": {
+    "global_local": "Permutation importance and SHAP agree on the top two features: bureau_score (AP drop 0.127, mean |SHAP| 0.904 log-odds) and dti (0.069, 0.544). Both are global summaries of what the model relies on across the 1,733 evaluation requests (SHAP uses a 300-request sample). The waterfall for request TR-009585 is local: bureau_score (+2.27), dti (+1.20) and loan_amount_sar (+0.20) pushed that one score up.",
+    "output_units": "SHAP values are in raw log-odds of the class-weighted model, not probability points. Base value plus the sum of SHAP equals the raw margin (maximum additivity error about 6e-15), and a sigmoid of that sum gives the raw score 0.903 for request TR-009585. That raw score is not a calibrated probability: after the sigmoid calibrator the same request has probability 0.480.",
+    "reason_limits": "The reason codes list only features that raised this request's score. They say what the model used, not why the applicant would default or what to change. None of the three values was imputed, and moving bureau_score by +/-1 left the raw score (0.9031) and the three top reasons unchanged, but correlated features can share credit, so this is still model behaviour, not cause.",
+    "calibration_evidence": "On 1,733 evaluation rows (139 positives) the sigmoid cut Brier from 0.1130 to 0.0671 and ECE from 0.1469 to 0.0225, while AP (0.2587) and ROC-AUC (0.7708) stayed identical because the mapping is monotone. The class weights had inflated the raw scores. The calibrator was learned on only 584 separate rows (40 positives), so it is a small-sample estimate, and sparse bins are noisy.",
+    "stability": "The 95% customer-cluster bootstrap (200 valid replicates, 1,520 customers) gives AP between 0.197 and 0.338 and a Brier change between -0.054 and -0.037, so the Brier gain is consistent across resamples while AP is quite uncertain. The intervals keep the model and calibrator fixed and do not cover refitting or future drift. The AP spread between the two evaluation quarters (sample SD 0.003) is descriptive only.",
+    "review_capacity": "The raw threshold 0.5882 (0.1733 after calibration) was chosen on the policy role. On the evaluation role the risk flags were 97 of 100 in 2024Q3 and 109 of 107 in 2024Q4, and adding requests near the threshold gave 109 and 122, so the review zone exceeds the 12% capacity: CAPACITY_REVIEW_REQUIRED. I did not raise the limit or retune on the evaluation role; a new policy would need development data and fresh evidence."
+  },
+  "checkpoint": {
+    "status": "READY_FOR_REVIEW",
+    "missing": [],
+    "no_automatic_grade": true
+  }
+}

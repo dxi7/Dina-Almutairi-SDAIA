@@ -1,0 +1,16 @@
+{
+  "source": "LIVE",
+  "responses": {
+    "threshold_reason": "I chose 0.6583 because it is the lowest-loss threshold at which every validation period stays within the 12% review capacity. It flags 526 of 5,039 requests (10.4%; the busiest period is 11.9%) with recall 40.9% and precision 29.9%. The policy (FN = 10 units, FP = 1 unit, 12% per period) was fixed before I looked at any result.",
+    "cost_capacity_tradeoff": "The cheapest rule without a capacity limit is 0.4486 with 2,275 units, but it flags 22.6% of requests and breaks capacity (busiest period 26.3%). The default 0.5 costs 2,403 units and also breaks capacity (19.9% flagged, busiest period 23.2%). The capacity-safe 0.6583 costs 2,639 units, which is 236 units more than 0.5, so staying within the review team's limit costs about 9.8% extra teaching loss and catches fewer defaults (227 missed instead of 162).",
+    "regional_gap": "False-positive rates are 8.09% (central), 8.29% (western), 7.72% (eastern) and 7.64% (other), a gap of 0.65 percentage points on 1,088 to 1,217 good requests per region. Recall differs more, from 34.6% (western) to 48.2% (other), and the groups are small. This is descriptive: it has no confidence interval and is not a fairness check, so the regional recall difference deserves a closer look.",
+    "limitations": "The threshold and its loss are estimated on the same out-of-fold outcomes, so this is development selection and not a final test. The out-of-fold data covers 50.39% of the training rows (4,961 warm-up rows have no prediction). Class weights make the scores uncalibrated, so the textbook threshold of 1/11 does not apply. The loss matrix is a simplified teaching policy in units, not money, and one flag means 'send to review', not a rejection.",
+    "why_accuracy_misleads": "Only 7.6% of requests are defaults, so flagging nobody already gives 92.4% accuracy while catching no default at all (loss 3,840 units). At 0.5 the weighted model has lower accuracy (81.3%) but much better recall (57.8%), and the unweighted model has the highest accuracy (92.6%) with only 12.5% recall. Accuracy hides which kind of error is being made, so I read recall, precision and the loss next to it.",
+    "why_oof": "Training predictions are scored on rows the model has already seen, so they are too optimistic. Out-of-fold predictions come from models that never saw those rows, from later periods, and with validation customers removed from training, so they imitate new requests. The challenge data must stay untouched for the final check and cannot be used to pick a threshold."
+  },
+  "checkpoint": {
+    "status": "READY_FOR_REVIEW",
+    "missing": [],
+    "automatic_grade": null
+  }
+}

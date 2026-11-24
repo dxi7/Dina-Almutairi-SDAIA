@@ -1,0 +1,18 @@
+{
+  "problem_statement": "Predict whether a synthetic loan applicant will have a default event within 90 days of applying, using only the 22 features known at application time. The model is meant to rank applications by risk at decision time. Today it is used only to learn how three model families compare on one random split; it is not a deployment estimate.",
+  "candidate": "Logistic Regression",
+  "notes": {
+    "evidence": "Logistic Regression had the highest ROC-AUC (0.821 vs 0.812 for XGBoost and 0.814 for LightGBM) and a practically tied Average Precision (0.326 vs 0.334 and 0.325, against a 7.9% prevalence baseline), while training in 0.04 s versus 0.38 s for XGBoost and 0.24 s for LightGBM. The paired bootstrap confirms the gaps are noise: every 95% interval for the difference to Logistic Regression includes 0 (for example XGBoost AP +0.008, interval -0.030 to +0.036). The boosters showed no demonstrated gain, so the simplest and fastest model is my starting candidate.",
+    "limitation": "This is one random stratified split of 2,000 comparison rows. 1,226 customers appear on both the development and comparison side, and time is ignored, so all three scores are probably optimistic and the ranking of models could change under honest validation. The experiment also says nothing about calibration, class weights, thresholds or the cost of errors.",
+    "next_test": "On Day 2, rebuild the comparison with customer-grouped and time-ordered folds that respect target maturity, and re-score the three models there. If XGBoost or LightGBM beats Logistic Regression by more than the bootstrap noise (about 0.02 AUC or 0.04 AP) under that design, I will switch the candidate."
+  },
+  "exit_answers": [
+    "ROC-AUC measures ranking across all thresholds, and its false-positive rate is divided by the many negatives, so with only 7.9% positives a model can look strong (AUC 0.82) while most of the cases it flags are still wrong. Average Precision looks at precision among flagged cases and is compared with the prevalence baseline (0.079), so it shows the practical quality of the top of the ranking; here AP is about 0.33, roughly four times the baseline but far from perfect.",
+    "The comparison rows are the only data that give an unbiased score. If they were used to choose the number of trees (or to tune anything), they would become part of model building and the final metrics would be optimistic because the model was effectively chosen to fit them. Early stopping therefore uses the inner-stop slice of the development rows, and the comparison rows are scored once at the end."
+  ],
+  "checkpoint": {
+    "status": "READY_FOR_REVIEW",
+    "missing": [],
+    "automatic_grade": null
+  }
+}

@@ -11,8 +11,11 @@ All records are synthetic. Nothing in this repository is real customer data, and
 ├── README.md                              Project overview and daily answers
 ├── notebooks/
 │   ├── 01_baseline_boosting.ipynb         Day 1: model comparison
-│   └── 02_validation_tuning.ipynb         Day 2: honest validation and tuning
-└── artifacts/                             Generated evidence files (Day 1 and Day 2)
+│   ├── 02_validation_tuning.ipynb         Day 2: honest validation and tuning
+│   ├── 03_cost_sensitive_decision.ipynb  Day 3: threshold, cost and capacity
+│   ├── 04_explain_calibrate.ipynb        Day 4: explanation and calibration
+│   └── 05_final_model.ipynb              Day 5: final model and delivery
+└── artifacts/                             Generated evidence files by day
 ```
 
 ## Day 1 - Baseline vs. boosting

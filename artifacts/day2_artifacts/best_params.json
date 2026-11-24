@@ -9,7 +9,7 @@
   "best_tuning_ap": 0.33326895378080756,
   "completed_trials": 8,
   "attempted_trials": 8,
-  "elapsed_seconds": 5.311470125999989,
+  "elapsed_seconds": 2.1508717090000005,
   "seed": 211,
   "max_trials": 8,
   "timeout_seconds": 120,

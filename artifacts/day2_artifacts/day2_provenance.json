@@ -4862,7 +4862,7 @@
       "TR-007369"
     ],
     "selected_trees": 80,
-    "train_seconds": 2.37970708200001,
+    "train_seconds": 0.3524844799999869,
     "refit_imputer_medians": [
       43.0,
       8053.82,
@@ -11031,7 +11031,7 @@
       "TR-007825"
     ],
     "selected_trees": 80,
-    "train_seconds": 1.1253367179999998,
+    "train_seconds": 0.28160448100004487,
     "refit_imputer_medians": [
       43.0,
       8137.195,
@@ -18530,7 +18530,7 @@
       "TR-008027"
     ],
     "selected_trees": 80,
-    "train_seconds": 0.5859569670000155,
+    "train_seconds": 1.6001080000000343,
     "refit_imputer_medians": [
       43.0,
       8071.69,
@@ -23420,7 +23420,7 @@
       "TR-007369"
     ],
     "selected_trees": 24,
-    "train_seconds": 1.2555722950000074,
+    "train_seconds": 0.5264713439999582,
     "inner_fit_rows": 1547,
     "inner_stop_rows": 812,
     "inner_stop_start": "2022-12-09",
@@ -31978,7 +31978,7 @@
       "TR-007825"
     ],
     "selected_trees": 36,
-    "train_seconds": 0.5730647330000238,
+    "train_seconds": 0.3727204360000087,
     "inner_fit_rows": 2185,
     "inner_stop_rows": 1116,
     "inner_stop_start": "2023-04-27",
@@ -42808,7 +42808,7 @@
       "TR-008027"
     ],
     "selected_trees": 19,
-    "train_seconds": 0.38595581199999174,
+    "train_seconds": 0.162493631000018,
     "inner_fit_rows": 2768,
     "inner_stop_rows": 1434,
     "inner_stop_start": "2023-08-28",

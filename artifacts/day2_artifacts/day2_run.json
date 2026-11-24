@@ -1,6 +1,6 @@
 {
   "technical_status": "TECHNICAL_READY",
-  "learner_status": "LEARNER_WORK_REQUIRED",
+  "learner_status": "READY_FOR_REVIEW",
   "data_revision": "fe0c0204e6076a7ac2139b7336485a097343fb8a",
   "lab_revision": "1e1da4acbee8941bef07245b259fb6c27ced4ad7",
   "support_sha256": {

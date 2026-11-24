@@ -1,20 +1,14 @@
 {
   "responses": {
-    "leak_example": "",
-    "split_reason": "",
-    "observed_gap": "",
-    "imputer_reason": "",
-    "limitations": ""
+    "leak_example": "days_past_due_60 and collection_calls are recorded only after the application, so they leak the outcome. With them a random split scored AP 0.9988 and ROC-AUC 0.9999; the clean random control without them scored AP 0.311, a drop of 0.688.",
+    "split_reason": "A random split lets the same customer and later periods sit on both sides, and labels that have not matured yet leak in. I used three forward folds where training labels must be 90 days mature (application date + 90 days < validation start) and removed each fold's validation customers from training (0 shared customers), so each fold looks like scoring later requests from unseen customers.",
+    "observed_gap": "Leaky random AP 0.9988 versus clean random 0.311 shows the leakage effect. The honest time-ordered folds gave AP 0.315 (fixed 80 trees, 5,039 rows) and 0.313 (reserved search), about the same as the clean random control (0.311), so after removing leakage the split design changed the score very little here, while the fold SD (0.043 and 0.026) shows how noisy three folds are.",
+    "imputer_reason": "Missing values are filled with statistics learned from the training rows of each fold only. Learning them from validation or all rows would let information about future requests flow into training and make the validation scores look better than they are.",
+    "limitations": "The folds are small and related: 5,039 out-of-fold rows (50.39% of the data, 4,961 warm-up rows have no prediction). Tuning ran 8 trials on a separate older cohort and did not improve on the fixed model (AP 0.313 vs 0.315). These results are a development check, not an independent final test, and they say nothing about fairness, calibration or operational value."
   },
   "checkpoint": {
-    "status": "LEARNER_WORK_REQUIRED",
-    "missing": [
-      "leak_example",
-      "split_reason",
-      "observed_gap",
-      "imputer_reason",
-      "limitations"
-    ],
+    "status": "READY_FOR_REVIEW",
+    "missing": [],
     "automatic_grade": null
   }
 }

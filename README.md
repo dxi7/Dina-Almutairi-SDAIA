@@ -1,167 +1,270 @@
-# Tamweel | SDAIA
+# Tamweel | Credit Risk Analytics
 
-Credit-risk project for SDA-DSC-211: predict whether a synthetic applicant defaults within 90 days of applying (`default_within_90d`) using only information available at application time. All data is synthetic; nothing here is deployment evidence.
+<p align="center">
+  <strong>From baseline modelling to a capacity-aware final decision</strong><br>
+  SDA-DSC-211 · Synthetic credit-risk prediction · Seed 211
+</p>
 
-## Repository structure
+<p align="center">
+  <img src="artifacts/day5_ensemble_comparison.png" width="880" alt="Day 5 comparison of single models and ensemble candidates">
+</p>
 
-```text
-README.md
-notebooks/01_baseline_boosting.ipynb        Day 1: model comparison
-notebooks/02_validation_tuning.ipynb        Day 2: honest validation and tuning
-notebooks/03_cost_sensitive_decision.ipynb  Day 3: cost-sensitive threshold
-notebooks/04_explain_calibrate.ipynb        Day 4: explanation and calibration
-notebooks/05_final_model.ipynb              Day 5: final model and delivery
-artifacts/                                  Evidence files (CSV, JSON, PNG)
-reports/                                    Decision card, interpretability report, model card
-submission/                                 submission.csv and project bundle
-```
+<p align="center">
+  <em>A five-day project covering model selection, leakage-safe validation, cost-sensitive decisions, model interpretation, calibration, and final delivery.</em>
+</p>
 
-## How to run
+> **Project scope:** predict whether a synthetic applicant defaults within 90 days of applying (\`default_within_90d\`), using information available at application time. All data are synthetic. This is a learning project, not a credit decision system and not evidence of production readiness.
 
-Open a notebook in Google Colab (free CPU) and choose **Runtime → Run all**. On a fresh session the first cell installs the pinned packages and restarts once; if a "session crashed" notice appears, choose **Run all** again. Seed 211; tiny last-decimal and timing differences are normal.
+## Project at a glance
 
-## Results at a glance
-
-| Day | Topic | Headline result |
+| Stage | Focus | Main finding |
 |---|---|---|
-| 1 | Baseline vs. boosting | ROC-AUC 0.81-0.82 for all three models; differences within noise |
-| 2 | Honest validation | Leaky AP 0.999 falls to 0.31 once leakage is removed |
-| 3 | Decision threshold | 0.5 breaks the 12% capacity; capacity-safe threshold 0.658 |
-| 4 | Explain and calibrate | `bureau_score` leads; Brier 0.113 → 0.067, ECE 0.147 → 0.022 |
-| 5 | Final model | KEEP SINGLE: Logistic Regression (mean AP 0.392); 300 flags of 2,500 |
+| Day 1 | Baselines and boosting | Three models performed similarly; LightGBM was a practical initial candidate, not a statistically proven winner. |
+| Day 2 | Leakage and validation | Removing post-application leakage reduced AP from 0.9988 to about 0.31 under honest evaluation. |
+| Day 3 | Cost and capacity policy | A threshold of 0.6583 respected the 12% per-period review cap; the default 0.5 threshold did not. |
+| Day 4 | Explanation and calibration | \`bureau_score\` was the strongest model signal; sigmoid calibration improved the Day 4 evaluation metrics. |
+| Day 5 | Final selection and delivery | **KEEP SINGLE — Logistic Regression.** No ensemble met the required AP improvement. The challenge batch ended with 300 flags out of 2,500. |
 
-```mermaid
-xychart-beta
-    title "Day 2: Average Precision by validation protocol"
-    x-axis ["Leaky random", "Clean random", "Honest fixed", "Honest tuned"]
-    y-axis "Average Precision" 0 --> 1
-    bar [0.999, 0.311, 0.315, 0.313]
-```
+## Contents
 
-## Day 1: baseline vs. boosting
+- [Project workflow](#project-workflow)
+- [Results and evidence](#results-and-evidence)
+- [Day 1 — Baseline comparison](#day-1--baseline-comparison)
+- [Day 2 — Honest validation](#day-2--honest-validation)
+- [Day 3 — Cost-sensitive decision](#day-3--cost-sensitive-decision)
+- [Day 4 — Explanation and calibration](#day-4--explanation-and-calibration)
+- [Day 5 — Final model and challenge batch](#day-5--final-model-and-challenge-batch)
+- [Daily questions and answers](#daily-questions-and-answers)
+- [Reproducibility](#reproducibility)
+- [Limitations](#limitations)
+- [Repository structure](#repository-structure)
 
-| Model | ROC-AUC | AP | Train time | Trees |
+## Project workflow
+
+The work follows five connected stages:
+
+1. Establish a baseline and compare candidate models.
+2. remove leakage and replace random evaluation with time-ordered, customer-separated validation.
+3. choose an operating threshold using the stated error costs and review-capacity constraint.
+4. inspect the Day 4 model's explanations and calibration behaviour.
+5. compare single models with ensemble candidates, select the final model, and apply the batch-level capacity rule.
+
+The notebooks contain the analysis and implementation. The artifacts and reports provide supporting evidence for the reported results.
+
+## Results and evidence
+
+### Day 1 — Baseline comparison
+
+| Model | ROC-AUC | Average Precision | Training time | Trees |
 |---|---:|---:|---:|---:|
-| Logistic Regression | 0.821 | 0.326 | 0.04 s | - |
+| Logistic Regression | 0.821 | 0.326 | 0.04 s | — |
 | XGBoost | 0.812 | 0.334 | 0.38 s | 61 |
 | LightGBM | 0.814 | 0.325 | 0.24 s | 41 |
 
-![Day 1 ROC and precision-recall curves](artifacts/day1_roc_pr.png)
+The comparison used 2,000 untouched rows. Paired bootstrap results did not show a clear statistically significant difference between the three models. LightGBM was retained as a practical initial candidate because it trained faster than XGBoost; it was not established as the best-performing model.
 
-## Day 2: honest validation and tuning
+<p align="center">
+  <img src="artifacts/day1_artifacts/day1_roc_pr.png" width="880" alt="Day 1 ROC and precision-recall curves comparing Logistic Regression, XGBoost and LightGBM">
+</p>
 
-| Protocol | ROC-AUC | AP | Rows scored |
+<p align="center">
+  <img src="artifacts/day1_artifacts/day1_learning_curves.png" width="880" alt="Day 1 learning curves">
+</p>
+
+### Day 2 — Honest validation
+
+| Validation protocol | ROC-AUC | Average Precision | Rows |
 |---|---:|---:|---:|
-| Leaky random (unsafe) | 0.9999 | 0.9988 | 10,000 |
-| Clean random (unsafe) | 0.801 | 0.311 | 10,000 |
+| Leaky random — unsafe | 0.9999 | 0.9988 | 10,000 |
+| Clean random — unsafe | 0.801 | 0.311 | 10,000 |
 | Honest, fixed 80 trees | 0.798 | 0.315 | 5,039 |
 | Honest, reserved search | 0.786 | 0.313 | 5,039 |
 
-![Day 2 validation comparison](artifacts/day2_validation_comparison.png)
+Two post-application fields, \`days_past_due_60\` and \`collection_calls\`, were removed because they would not be available at application time. The honest evaluation used three time-ordered folds, a 90-day label-maturity rule, customer separation between training and validation, and imputation fitted on training data only.
 
-## Day 3: cost-sensitive decision
+The honest out-of-fold predictions covered 5,039 rows (50.39%). Reserved search did not improve AP over the fixed 80-tree result (0.313 vs. 0.315).
 
-Policy: a missed default (FN) costs 10 teaching units, a false alarm (FP) costs 1, and no validation period may flag more than 12% of requests. Class-weighted LightGBM, 5,039 out-of-fold requests.
+<p align="center">
+  <img src="artifacts/day2_artifacts/day2_validation_comparison.png" width="880" alt="Day 2 comparison of leaky, clean and honest validation protocols">
+</p>
 
-| Rule | Threshold | Flagged | Recall | Precision | Loss (units) | Within capacity |
+<p align="center">
+  <img src="artifacts/day2_artifacts/day2_fold_sizes.png" width="880" alt="Day 2 time-ordered fold sizes">
+</p>
+
+<p align="center">
+  <img src="artifacts/day2_artifacts/day2_search.png" width="880" alt="Day 2 reserved hyperparameter search results">
+</p>
+
+### Day 3 — Cost-sensitive decision
+
+The review policy assigns 10 teaching units to a false negative and 1 unit to a false positive. No validation period may flag more than 12% of requests. The results below use 5,039 out-of-fold predictions from the class-weighted LightGBM model.
+
+| Decision rule | Threshold | Flagged | Recall | Precision | Loss (teaching units) | Capacity |
 |---|---:|---:|---:|---:|---:|:---:|
-| Default 0.5 | 0.5000 | 1,005 (19.9%) | 57.8% | 22.1% | 2,403 | No |
-| Min. loss, no capacity limit | 0.4486 | 1,141 (22.6%) | 64.1% | 21.6% | 2,275 | No |
-| Min. loss, every period ≤ 12% | 0.6583 | 526 (10.4%) | 40.9% | 29.9% | 2,639 | Yes |
+| Default threshold | 0.5000 | 1,005 (19.9%) | 57.8% | 22.1% | 2,403 | Exceeded |
+| Minimum loss, no cap | 0.4486 | 1,141 (22.6%) | 64.1% | 21.6% | 2,275 | Exceeded |
+| Minimum loss within every-period cap | 0.6583 | 526 (10.4%) | 40.9% | 29.9% | 2,639 | Respected |
 
-```mermaid
-xychart-beta
-    title "Day 3: share of requests flagged (12% ceiling per period)"
-    x-axis ["Default 0.5", "Unconstrained", "Capacity-safe"]
-    y-axis "Flagged (%)" 0 --> 25
-    bar [19.9, 22.6, 10.4]
-```
+The capacity-safe rule costs 236 more teaching units than the default threshold, but it is the only one of these operating points that respects the 12% limit in every period. A review flag means “send for review”; it does not mean reject an applicant.
 
-![Day 3 cost curve](artifacts/cost_curve.png)
+<p align="center">
+  <img src="artifacts/day3_artifacts/artifacts/cost_curve.png" width="880" alt="Day 3 cost curve showing the threshold and loss trade-off">
+</p>
 
-## Day 4: explanation and calibration
+<p align="center">
+  <img src="artifacts/day3_artifacts/artifacts/day3_capacity_regions.png" width="880" alt="Day 3 review capacity by period or region">
+</p>
 
-| Evidence | Value |
-|---|---|
-| Top feature (mean abs SHAP, log-odds) | `bureau_score` 0.904, then `dti` 0.544 |
-| Held-out AP drop when shuffled | `bureau_score` 0.127, then `dti` 0.069 |
+<p align="center">
+  <img src="artifacts/day3_artifacts/artifacts/day3_roc_pr.png" width="880" alt="Day 3 ROC and precision-recall evidence">
+</p>
+
+### Day 4 — Explanation and calibration
+
+Day 4 explanations refer to the **class-weighted LightGBM model**, not the final Day 5 Logistic Regression model.
+
+| Evidence | Result |
+|---|---:|
+| Mean absolute SHAP — \`bureau_score\` | 0.904 log-odds |
+| Mean absolute SHAP — \`dti\` | 0.544 log-odds |
+| Held-out AP drop after shuffling \`bureau_score\` | 0.127 |
+| Held-out AP drop after shuffling \`dti\` | 0.069 |
 | Brier, raw → sigmoid | 0.1130 → 0.0671 |
 | ECE, raw → sigmoid | 0.1469 → 0.0225 |
-| Review zone | `CAPACITY_REVIEW_REQUIRED` (a valid outcome) |
+| Review status | \`CAPACITY_REVIEW_REQUIRED\` |
 
-```mermaid
-xychart-beta
-    title "Day 4: calibration error before and after the sigmoid"
-    x-axis ["Brier raw", "Brier sigmoid", "ECE raw", "ECE sigmoid"]
-    y-axis "Value" 0 --> 0.16
-    bar [0.113, 0.067, 0.147, 0.022]
-```
+The calibration evaluation contained 1,733 rows and 139 positive cases. AP and ROC-AUC remained unchanged after sigmoid calibration, while Brier score and ECE improved. The review zone still exceeded the 12% capacity in evaluation quarters, so the review status remains an important finding rather than a success claim.
 
-![Day 4 reliability curve](artifacts/reliability_curve.png)
+<p align="center">
+  <img src="artifacts/day4_artifacts/artifacts/reliability_curve.png" width="880" alt="Day 4 reliability curve before and after sigmoid calibration">
+</p>
 
-## Day 5: final model and delivery
+<p align="center">
+  <img src="artifacts/day4_artifacts/artifacts/shap_beeswarm.png" width="880" alt="Day 4 SHAP beeswarm plot for the class-weighted LightGBM model">
+</p>
 
-Three single models, equal averaging, weighted averaging and stacking were compared on three forward folds (2023Q1, 2023Q3, 2024Q1). An ensemble would be accepted only if its AP gain exceeded the best single model's fold SD (0.030) without a worse Brier or ECE.
+<p align="center">
+  <img src="artifacts/day4_artifacts/artifacts/shap_waterfall.png" width="880" alt="Day 4 SHAP waterfall explanation">
+</p>
 
-| Candidate | Mean AP | Fold SD | Brier | ECE | AP change vs best single |
+<p align="center">
+  <img src="artifacts/day4_artifacts/artifacts/permutation_importance.png" width="880" alt="Day 4 permutation importance">
+</p>
+
+<p align="center">
+  <img src="artifacts/day4_artifacts/artifacts/review_zone.png" width="880" alt="Day 4 review-zone and capacity diagnostic">
+</p>
+
+### Day 5 — Final model and challenge batch
+
+The final comparison used three forward folds: 2023Q1, 2023Q3 and 2024Q1. The reference fold standard deviation for the best single model's AP was 0.0298. An ensemble had to improve AP by more than this reference and stay within the gate tolerances: Brier increase no greater than 0.005 and ECE increase no greater than 0.01.
+
+| Candidate | Mean AP | Fold SD | Brier | ECE | AP change vs. Logistic |
 |---|---:|---:|---:|---:|---:|
-| Logistic Regression | 0.392 | 0.030 | 0.0633 | 0.0188 | 0 |
-| LightGBM | 0.346 | 0.044 | 0.0661 | 0.0231 | -0.046 |
-| XGBoost | 0.353 | 0.029 | 0.0657 | 0.0228 | -0.039 |
-| Equal average | 0.372 | 0.033 | 0.0643 | 0.0204 | -0.020 |
-| Weighted average | 0.389 | 0.029 | 0.0633 | 0.0177 | -0.002 |
-| Stacking | 0.383 | 0.030 | 0.0660 | 0.0311 | -0.009 |
+| Logistic Regression | 0.3917 | 0.0298 | 0.0633 | 0.0188 | 0.0000 |
+| LightGBM | 0.3455 | 0.0435 | 0.0661 | 0.0231 | -0.0462 |
+| XGBoost | 0.3526 | 0.0290 | 0.0657 | 0.0228 | -0.0390 |
+| Equal average | 0.3717 | 0.0326 | 0.0643 | 0.0204 | -0.0200 |
+| Weighted average | 0.3894 | 0.0291 | 0.0633 | 0.0177 | -0.0022 |
+| Stacking | 0.3831 | 0.0295 | 0.0660 | 0.0311 | -0.0085 |
 
-**Decision: KEEP SINGLE (Logistic Regression).** Challenge batch: 330 of 2,500 requests passed the threshold and the 12% cap kept 300.
+**Decision: KEEP SINGLE — Logistic Regression.** No ensemble achieved the required AP lift. Weighted averaging had a slightly lower ECE, but its AP was lower than Logistic Regression and the improvement was not enough to justify the added complexity.
 
-```mermaid
-xychart-beta
-    title "Day 5: mean Average Precision by candidate"
-    x-axis ["LightGBM", "XGBoost", "Logistic", "Equal", "Weighted", "Stack"]
-    y-axis "Mean AP" 0 --> 0.5
-    bar [0.346, 0.353, 0.392, 0.372, 0.389, 0.383]
-```
+The final sigmoid calibration diagnostics were calculated on the same 836 rows (78 positives) used to fit the calibrator. In those fit diagnostics, Brier changed from 0.0765 to 0.0781 and ECE from 0.0211 to 0.0349; both worsened. AP (0.2878) and ROC-AUC (0.7890) were unchanged. These are not independent calibration results.
 
-![Day 5 ensemble comparison](artifacts/day5_ensemble_comparison.png)
+For the 2,500-request challenge batch, 330 requests passed the transported threshold (0.122258). The 12% batch cap retained 300 flags and removed 30. The boundary score was 0.129908, and equal-score blocks were not split. Challenge labels were unavailable, so no challenge AP, loss, FPR, or fairness performance is claimed.
 
-## Daily answers | الإجابات اليومية
+<p align="center">
+  <img src="submission/project_bundle/artifacts/day5_ensemble_comparison.png" width="880" alt="Day 5 comparison of single models and ensemble candidates">
+</p>
 
-### Day 1 | اليوم الأول
+<p align="center">
+  <img src="submission/project_bundle/artifacts/day5_calibration_fit.png" width="880" alt="Day 5 sigmoid calibration fit diagnostics">
+</p>
 
-**Initial candidate:** LightGBM.
+<p align="center">
+  <img src="submission/project_bundle/artifacts/day5_challenge_capacity.png" width="880" alt="Day 5 challenge batch capacity result">
+</p>
 
-**Strongest evidence:** on the 2,000 untouched comparison rows LightGBM reached ROC-AUC 0.814 and Average Precision 0.325, and trained faster than XGBoost (0.24 s vs 0.38 s, 41 trees). The paired bootstrap showed no significant difference between the three models, so it is a practical initial choice, not a proven winner.
+<p align="center">
+  <img src="submission/project_bundle/artifacts/day5_policy_regions.png" width="880" alt="Day 5 regional policy diagnostic">
+</p>
 
-**Limitation and next step:** one random split, with 1,226 customers on both sides and no time ordering. Day 2 uses customer-grouped, time-ordered validation.
+## Daily questions and answers
 
-### Day 2 | اليوم 2
+### Day 1 — Why was LightGBM selected as the initial candidate?
 
-**Leakage risk:** `days_past_due_60` and `collection_calls` are recorded only after the application, so they leak the outcome. Keeping them inflated AP to 0.9988; the clean random control gave 0.311.
+LightGBM was a practical starting point because it trained faster than XGBoost (0.24 s vs. 0.38 s) while reaching a similar ROC-AUC (0.814). The paired bootstrap did not establish a clear statistical winner among the three models. The initial split also had limitations: 1,226 customers appeared on both sides and the split was not time-ordered. Day 2 therefore moved to customer-separated, time-ordered validation.
 
-**How the validation design prevented it:** I dropped both fields and checked for duplicate events (none). I used three time-ordered folds with a label-maturity rule (application date + 90 days < validation start), removed each fold's validation customers from training (0 shared), learned imputation inside training only, and tuned on a separate older cohort before reading any outer result.
+### Day 2 — What caused leakage, and how was it addressed?
 
-**Limitations:** small, related folds (5,039 out-of-fold rows, 50.39% coverage); tuning did not help (AP 0.313 vs 0.315 fixed). Not a final independent test.
+The fields \`days_past_due_60\` and \`collection_calls\` describe events after application and would not be available at prediction time. They inflated the leaky random AP to 0.9988. Both were removed. The revised design used time-ordered folds, 90-day label maturity, no shared validation customers in training, and training-only imputation. The honest evaluation covered 5,039 out-of-fold rows; reserved tuning did not improve AP over the fixed model.
 
-### Day 3 | اليوم الثالث
+### Day 3 — Why is a fixed threshold of 0.5 not always suitable?
 
-**Why is a fixed threshold of 0.5 not always suitable for this review policy?**
+A fixed threshold does not account for the asymmetric error costs or the review-capacity limit. At 0.5, 1,005 requests were flagged (19.9%), and the busiest period reached 23.2%, exceeding the 12% cap. The unconstrained minimum-loss threshold flagged even more requests. The threshold 0.6583 respected the cap in every period, with 526 flags (10.4%), recall of 40.9%, precision of 29.9%, and loss of 2,639 teaching units. The threshold and loss were estimated on the same OOF outcomes, so this is a development result rather than a final independent test.
 
-Because 0.5 ignores the policy. Here a missed default costs 10 times a false alarm, only about 7.6% of requests are defaults, the scores come from a class-weighted model (so they are not calibrated probabilities), and each period may flag at most 12% of requests. At 0.5 the model flagged 1,005 requests (19.9%), and its busiest period reached 23.2%, so the capacity rule was broken. The loss-minimising threshold without a limit (0.4486) is cheaper (2,275 units) but flags even more (22.6%). Choosing the lowest-loss threshold that keeps every period within 12% gave 0.6583: 526 flags (10.4%), recall 40.9%, precision 29.9%, and 2,639 units, which is 236 units more than 0.5 but the only option that respects capacity. So the threshold must come from the loss and capacity policy, not from a default.
+### Day 4 — Which feature mattered most, and does that establish causation?
 
-**Limitations:** the threshold and its loss were estimated on the same out-of-fold outcomes (a development result, not a final test); loss is in teaching units, not money; a flag means "send to review", not rejection.
+\`bureau_score\` was the strongest model signal: it had the largest mean absolute SHAP value (0.904 log-odds), the largest held-out AP drop after permutation (0.127), and a +2.27 log-odds contribution in the highest-scoring case explained. These methods describe how the model uses features; they do not show that changing a feature would cause a change in default risk. Correlated variables can share importance, and SHAP here explains the raw class-weighted LightGBM score in log-odds, not the calibrated probability.
 
-### Day 4 | اليوم الرابع
+### Day 5 — Why keep a single model instead of an ensemble?
 
-**Which feature was most important in your explanation, and why does that not prove causation?**
+Logistic Regression had the best mean AP across the three forward folds (0.3917). Equal averaging, weighted averaging and stacking all had lower AP, and none met the required improvement of more than the 0.0298 reference fold SD. The decision was therefore **KEEP SINGLE**. The three fold histories overlap, so fold SD is descriptive rather than a confidence interval, and the training data was reused during the course; this is not an untouched final test.
 
-`bureau_score` was the most important feature. It had the largest mean absolute SHAP value (0.904 log-odds, against 0.544 for `dti`), the largest held-out Average Precision drop when shuffled (0.127 from a baseline of 0.259), and it was the top contribution (+2.27 log-odds) for the highest-scoring request I explained. This does not prove causation because SHAP and permutation importance only describe what the model relies on to rank requests in this synthetic data, not what would happen if someone's score were changed. Correlated features share credit, `bureau_score` may stand in for other drivers, and a model trained on observed associations cannot separate cause from correlation. SHAP also explains the raw class-weighted score in log-odds, not the calibrated probability.
+## Reproducibility
 
-**Calibration and limits:** the sigmoid improved Brier from 0.1130 to 0.0671 and ECE from 0.1469 to 0.0225 without changing AP or ROC-AUC. The review zone still exceeded the 12% capacity in the evaluation quarters (`CAPACITY_REVIEW_REQUIRED`), and the evaluation period was seen earlier in the course, so this is not an untouched final test.
+- Open the notebooks in Google Colab using a free CPU runtime.
+- Run each notebook from top to bottom. The notebooks use seed 211.
+- The first setup cell may install pinned packages and restart the runtime; if Colab displays a session-restart notice, run the notebook again.
+- Small last-decimal and execution-time differences can occur across environments.
+- See the Day 5 project bundle under \`submission/project_bundle/\` for the final model, policy, reports, scripts and delivery evidence.
 
-### Day 5 | اليوم الخامس
+## Limitations
 
-**Why did you choose the single model or the ensemble for the final project?**
+- All data are synthetic and do not represent real applicants, lenders, or regions.
+- This work is for education and review only. It must not be used to approve, reject, price, or otherwise make real financing decisions.
+- Day 1 used a random split with customer overlap; Day 2 onward addressed this with time-ordered, customer-separated validation.
+- The Day 3 threshold and loss were selected and evaluated on the same OOF outcomes.
+- Day 4 explanations belong to class-weighted LightGBM. They do not transfer to the final Day 5 Logistic Regression model.
+- Day 5 sigmoid metrics are fit diagnostics on the calibrator's own 836 fitting rows, not independent evidence.
+- The three Day 5 forward folds have overlapping training histories; their standard deviation is descriptive, not a confidence interval.
+- Challenge labels are unavailable. No challenge-set predictive performance or fairness claim is made.
+- A review flag means further review, not automatic rejection.
 
-I kept a single model, Logistic Regression, because no ensemble earned its extra complexity. Across the three forward folds it had the best mean Average Precision (0.392, fold SD 0.030), ahead of XGBoost (0.353) and LightGBM (0.346). Equal averaging (0.372), weighted averaging (0.389) and stacking (0.383) all scored lower, so none came near the required gain of more than 0.030, and their Brier and ECE were not better in a way that would justify them. The gate therefore returned KEEP SINGLE, which is a valid result. A single logistic model is also simpler to refit, explain and monitor. The weights and the stacker were learned on inner out-of-fold data only, with customers separated and labels mature.
+## Repository structure
 
-**Limitations:** three overlapping periods make the fold SD descriptive, not a confidence interval, and the training data was reused throughout the course, so this is not an untouched final test. The sigmoid calibration diagnostics are scored on the same 836 rows that fitted it (78 positives), and the Day 4 explanations belong to a different model (class-weighted LightGBM), so they must be rechecked for this final model. There are no challenge labels, so no challenge performance or fairness claim is made.
+\`\`\`text
+README.md
+notebooks/
+  01_baseline_boosting.ipynb
+  02_validation_tuning.ipynb
+  03_cost_sensitive_decision.ipynb
+  04_explain_calibrate.ipynb
+  05_final_model.ipynb
+artifacts/
+  day1_artifacts/
+  day2_artifacts/
+  day3_artifacts/
+  day4_artifacts/
+  ensemble_comparison.csv
+  final_metrics.json
+  final_policy.json
+reports/
+submission/
+  submission.csv
+  project_bundle/
+    artifacts/
+    data/
+    notebooks/
+    reports/
+    scripts/
+    submission/
+\`\`\`
+
+## Project status
+
+**Final model selection: KEEP SINGLE — Logistic Regression.**
+
+The repository documents the five-day workflow, its evidence, and its limitations. The results support a course-project decision, not deployment or real-world credit use.

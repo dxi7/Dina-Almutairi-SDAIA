@@ -34,7 +34,7 @@
 - [Day 3 — Cost-sensitive decision](#day-3--cost-sensitive-decision)
 - [Day 4 — Explanation and calibration](#day-4--explanation-and-calibration)
 - [Day 5 — Final model and challenge batch](#day-5--final-model-and-challenge-batch)
-- [Daily questions and answers](#daily-questions-and-answers)
+- [Daily answers](#daily-answers)
 - [Reproducibility](#reproducibility)
 - [Limitations](#limitations)
 - [Repository structure](#repository-structure)
@@ -191,7 +191,7 @@ For the 2,500-request challenge batch, 330 requests passed the transported thres
   <img src="submission/project_bundle/artifacts/day5_policy_regions.png" width="880" alt="Day 5 regional policy diagnostic">
 </p>
 
-## Daily questions and answers
+## Daily answers
 
 ### Day 1 — Why was LightGBM selected as the initial candidate?
 
@@ -235,36 +235,49 @@ Logistic Regression had the best mean AP across the three forward folds (0.3917)
 
 ## Repository structure
 
+The repository is organized by purpose: notebooks contain the day-by-day analysis, root-level artifacts preserve evaluation evidence, reports summarize the final decisions, and the submission folder contains the challenge output and packaged project files.
+
 ```text
-README.md
-tamweel/
-  __init__.py
-  inference.py
-notebooks/
-  01_baseline_boosting.ipynb
-  02_validation_tuning.ipynb
-  03_cost_sensitive_decision.ipynb
-  04_explain_calibrate.ipynb
-  05_final_model.ipynb
-artifacts/
-  day1_artifacts/
-  day2_artifacts/
-  day3_artifacts/
-  day4_artifacts/
-  ensemble_comparison.csv
-  final_metrics.json
-  final_policy.json
-reports/
-submission/
-  submission.csv
-  project_bundle/
-    artifacts/
-    data/
-    notebooks/
-    reports/
-    scripts/
-    submission/
+.
+├── README.md
+├── notebooks/
+│   ├── 01_baseline_boosting.ipynb
+│   ├── 02_validation_tuning.ipynb
+│   ├── 03_cost_sensitive_decision.ipynb
+│   ├── 04_explain_calibrate.ipynb
+│   └── 05_final_model.ipynb
+├── tamweel/
+│   ├── __init__.py
+│   └── inference.py
+├── artifacts/
+│   ├── day1_artifacts/
+│   ├── day2_artifacts/
+│   ├── day3_artifacts/
+│   ├── day4_artifacts/
+│   ├── final_model/
+│   ├── ensemble_comparison.csv
+│   ├── final_metrics.json
+│   └── final_policy.json
+├── reports/
+│   ├── ENSEMBLE_DECISION.md
+│   └── MODEL_CARD.md
+└── submission/
+    ├── submission.csv
+    ├── submission_manifest.json
+    └── project_bundle/
+        ├── artifacts/
+        ├── data/
+        ├── notebooks/
+        ├── reports/
+        ├── scripts/
+        └── submission/
 ```
+
+- **notebooks/** — the five analysis notebooks, from baseline modelling through final model selection.
+- **tamweel/** — reusable inference code.
+- **artifacts/** — day-level outputs, evaluation evidence, final model files, metrics, and policy.
+- **reports/** — the model card and final ensemble decision.
+- **submission/** — generated challenge predictions, manifest, and complete project bundle.
 
 ## Project status
 

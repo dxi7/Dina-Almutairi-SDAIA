@@ -6,14 +6,14 @@
 </p>
 
 <p align="center">
-  <img src="artifacts/day5_ensemble_comparison.png" width="880" alt="Day 5 comparison of single models and ensemble candidates">
+  <img src="submission/project_bundle/artifacts/day5_ensemble_comparison.png" width="880" alt="Day 5 comparison of single models and ensemble candidates">
 </p>
 
 <p align="center">
   <em>A five-day project covering model selection, leakage-safe validation, cost-sensitive decisions, model interpretation, calibration, and final delivery.</em>
 </p>
 
-> **Project scope:** predict whether a synthetic applicant defaults within 90 days of applying (\`default_within_90d\`), using information available at application time. All data are synthetic. This is a learning project, not a credit decision system and not evidence of production readiness.
+> **Project scope:** predict whether a synthetic applicant defaults within 90 days of applying (`default_within_90d`), using information available at application time. All data are synthetic. This is a learning project, not a credit decision system and not evidence of production readiness.
 
 ## Project at a glance
 
@@ -22,7 +22,7 @@
 | Day 1 | Baselines and boosting | Three models performed similarly; LightGBM was a practical initial candidate, not a statistically proven winner. |
 | Day 2 | Leakage and validation | Removing post-application leakage reduced AP from 0.9988 to about 0.31 under honest evaluation. |
 | Day 3 | Cost and capacity policy | A threshold of 0.6583 respected the 12% per-period review cap; the default 0.5 threshold did not. |
-| Day 4 | Explanation and calibration | \`bureau_score\` was the strongest model signal; sigmoid calibration improved the Day 4 evaluation metrics. |
+| Day 4 | Explanation and calibration | `bureau_score` was the strongest model signal; sigmoid calibration improved the Day 4 evaluation metrics. |
 | Day 5 | Final selection and delivery | **KEEP SINGLE — Logistic Regression.** No ensemble met the required AP improvement. The challenge batch ended with 300 flags out of 2,500. |
 
 ## Contents
@@ -80,7 +80,7 @@ The comparison used 2,000 untouched rows. Paired bootstrap results did not show 
 | Honest, fixed 80 trees | 0.798 | 0.315 | 5,039 |
 | Honest, reserved search | 0.786 | 0.313 | 5,039 |
 
-Two post-application fields, \`days_past_due_60\` and \`collection_calls\`, were removed because they would not be available at application time. The honest evaluation used three time-ordered folds, a 90-day label-maturity rule, customer separation between training and validation, and imputation fitted on training data only.
+Two post-application fields, `days_past_due_60` and `collection_calls`, were removed because they would not be available at application time. The honest evaluation used three time-ordered folds, a 90-day label-maturity rule, customer separation between training and validation, and imputation fitted on training data only.
 
 The honest out-of-fold predictions covered 5,039 rows (50.39%). Reserved search did not improve AP over the fixed 80-tree result (0.313 vs. 0.315).
 
@@ -126,13 +126,13 @@ Day 4 explanations refer to the **class-weighted LightGBM model**, not the final
 
 | Evidence | Result |
 |---|---:|
-| Mean absolute SHAP — \`bureau_score\` | 0.904 log-odds |
-| Mean absolute SHAP — \`dti\` | 0.544 log-odds |
-| Held-out AP drop after shuffling \`bureau_score\` | 0.127 |
-| Held-out AP drop after shuffling \`dti\` | 0.069 |
+| Mean absolute SHAP — `bureau_score` | 0.904 log-odds |
+| Mean absolute SHAP — `dti` | 0.544 log-odds |
+| Held-out AP drop after shuffling `bureau_score` | 0.127 |
+| Held-out AP drop after shuffling `dti` | 0.069 |
 | Brier, raw → sigmoid | 0.1130 → 0.0671 |
 | ECE, raw → sigmoid | 0.1469 → 0.0225 |
-| Review status | \`CAPACITY_REVIEW_REQUIRED\` |
+| Review status | `CAPACITY_REVIEW_REQUIRED` |
 
 The calibration evaluation contained 1,733 rows and 139 positive cases. AP and ROC-AUC remained unchanged after sigmoid calibration, while Brier score and ECE improved. The review zone still exceeded the 12% capacity in evaluation quarters, so the review status remains an important finding rather than a success claim.
 
@@ -199,7 +199,7 @@ LightGBM was a practical starting point because it trained faster than XGBoost (
 
 ### Day 2 — What caused leakage, and how was it addressed?
 
-The fields \`days_past_due_60\` and \`collection_calls\` describe events after application and would not be available at prediction time. They inflated the leaky random AP to 0.9988. Both were removed. The revised design used time-ordered folds, 90-day label maturity, no shared validation customers in training, and training-only imputation. The honest evaluation covered 5,039 out-of-fold rows; reserved tuning did not improve AP over the fixed model.
+The fields `days_past_due_60` and `collection_calls` describe events after application and would not be available at prediction time. They inflated the leaky random AP to 0.9988. Both were removed. The revised design used time-ordered folds, 90-day label maturity, no shared validation customers in training, and training-only imputation. The honest evaluation covered 5,039 out-of-fold rows; reserved tuning did not improve AP over the fixed model.
 
 ### Day 3 — Why is a fixed threshold of 0.5 not always suitable?
 
@@ -207,7 +207,7 @@ A fixed threshold does not account for the asymmetric error costs or the review-
 
 ### Day 4 — Which feature mattered most, and does that establish causation?
 
-\`bureau_score\` was the strongest model signal: it had the largest mean absolute SHAP value (0.904 log-odds), the largest held-out AP drop after permutation (0.127), and a +2.27 log-odds contribution in the highest-scoring case explained. These methods describe how the model uses features; they do not show that changing a feature would cause a change in default risk. Correlated variables can share importance, and SHAP here explains the raw class-weighted LightGBM score in log-odds, not the calibrated probability.
+`bureau_score` was the strongest model signal: it had the largest mean absolute SHAP value (0.904 log-odds), the largest held-out AP drop after permutation (0.127), and a +2.27 log-odds contribution in the highest-scoring case explained. These methods describe how the model uses features; they do not show that changing a feature would cause a change in default risk. Correlated variables can share importance, and SHAP here explains the raw class-weighted LightGBM score in log-odds, not the calibrated probability.
 
 ### Day 5 — Why keep a single model instead of an ensemble?
 
@@ -219,7 +219,7 @@ Logistic Regression had the best mean AP across the three forward folds (0.3917)
 - Run each notebook from top to bottom. The notebooks use seed 211.
 - The first setup cell may install pinned packages and restart the runtime; if Colab displays a session-restart notice, run the notebook again.
 - Small last-decimal and execution-time differences can occur across environments.
-- See the Day 5 project bundle under \`submission/project_bundle/\` for the final model, policy, reports, scripts and delivery evidence.
+- See the Day 5 project bundle under `submission/project_bundle/` for the final model, policy, reports, scripts and delivery evidence.
 
 ## Limitations
 
@@ -235,7 +235,7 @@ Logistic Regression had the best mean AP across the three forward folds (0.3917)
 
 ## Repository structure
 
-\`\`\`text
+```text
 README.md
 notebooks/
   01_baseline_boosting.ipynb
@@ -261,7 +261,7 @@ submission/
     reports/
     scripts/
     submission/
-\`\`\`
+```
 
 ## Project status
 

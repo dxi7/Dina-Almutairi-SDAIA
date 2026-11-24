@@ -237,6 +237,9 @@ Logistic Regression had the best mean AP across the three forward folds (0.3917)
 
 ```text
 README.md
+tamweel/
+  __init__.py
+  inference.py
 notebooks/
   01_baseline_boosting.ipynb
   02_validation_tuning.ipynb

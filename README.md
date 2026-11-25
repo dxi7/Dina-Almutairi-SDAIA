@@ -318,6 +318,8 @@ The repository is organized to provide access to the analysis notebooks, dataset
 
 This project was completed as part of the SDA-DSC-211 learning programme at SDAIA Academy. Visit the [SDAIA Academy GitHub organization](https://github.com/SDAIAAcademy) for its public learning resources.
 
+[![SDAIA Academy on GitHub](https://img.shields.io/badge/SDAIA%20Academy-GitHub-181717?logo=github)](https://github.com/SDAIAAcademy)
+
 ## Project status
 
 **Final model selection: KEEP SINGLE — Logistic Regression.**

@@ -64,11 +64,11 @@ The notebooks contain the analysis and implementation. The artifacts and reports
 The comparison used 2,000 untouched rows. Paired bootstrap results did not show a clear statistically significant difference between the three models. LightGBM was retained as a practical initial candidate because it trained faster than XGBoost; it was not established as the best-performing model.
 
 <p align="center">
-  <img src="artifacts/day1_artifacts/day1_roc_pr.png" width="880" alt="Day 1 ROC and precision-recall curves comparing Logistic Regression, XGBoost and LightGBM">
+  <img src="submission/project_bundle/evidence/day1/day1_roc_pr.png" width="880" alt="Day 1 ROC and precision-recall curves comparing Logistic Regression, XGBoost and LightGBM">
 </p>
 
 <p align="center">
-  <img src="artifacts/day1_artifacts/day1_learning_curves.png" width="880" alt="Day 1 learning curves">
+  <img src="submission/project_bundle/evidence/day1/day1_learning_curves.png" width="880" alt="Day 1 learning curves">
 </p>
 
 ### Day 2 — Honest validation
@@ -85,15 +85,15 @@ Two post-application fields, `days_past_due_60` and `collection_calls`, were rem
 The honest out-of-fold predictions covered 5,039 rows (50.39%). Reserved search did not improve AP over the fixed 80-tree result (0.313 vs. 0.315).
 
 <p align="center">
-  <img src="artifacts/day2_artifacts/day2_validation_comparison.png" width="880" alt="Day 2 comparison of leaky, clean and honest validation protocols">
+  <img src="submission/project_bundle/evidence/day2/day2_validation_comparison.png" width="880" alt="Day 2 comparison of leaky, clean and honest validation protocols">
 </p>
 
 <p align="center">
-  <img src="artifacts/day2_artifacts/day2_fold_sizes.png" width="880" alt="Day 2 time-ordered fold sizes">
+  <img src="submission/project_bundle/evidence/day2/day2_fold_sizes.png" width="880" alt="Day 2 time-ordered fold sizes">
 </p>
 
 <p align="center">
-  <img src="artifacts/day2_artifacts/day2_search.png" width="880" alt="Day 2 reserved hyperparameter search results">
+  <img src="submission/project_bundle/evidence/day2/day2_search.png" width="880" alt="Day 2 reserved hyperparameter search results">
 </p>
 
 ### Day 3 — Cost-sensitive decision
@@ -109,15 +109,15 @@ The review policy assigns 10 teaching units to a false negative and 1 unit to a 
 The capacity-safe rule costs 236 more teaching units than the default threshold, but it is the only one of these operating points that respects the 12% limit in every period. A review flag means “send for review”; it does not mean reject an applicant.
 
 <p align="center">
-  <img src="artifacts/day3_artifacts/artifacts/cost_curve.png" width="880" alt="Day 3 cost curve showing the threshold and loss trade-off">
+  <img src="submission/project_bundle/evidence/day3/artifacts/cost_curve.png" width="880" alt="Day 3 cost curve showing the threshold and loss trade-off">
 </p>
 
 <p align="center">
-  <img src="artifacts/day3_artifacts/artifacts/day3_capacity_regions.png" width="880" alt="Day 3 review capacity by period or region">
+  <img src="submission/project_bundle/evidence/day3/artifacts/day3_capacity_regions.png" width="880" alt="Day 3 review capacity by period or region">
 </p>
 
 <p align="center">
-  <img src="artifacts/day3_artifacts/artifacts/day3_roc_pr.png" width="880" alt="Day 3 ROC and precision-recall evidence">
+  <img src="submission/project_bundle/evidence/day3/artifacts/day3_roc_pr.png" width="880" alt="Day 3 ROC and precision-recall evidence">
 </p>
 
 ### Day 4 — Explanation and calibration
@@ -137,23 +137,23 @@ Day 4 explanations refer to the **class-weighted LightGBM model**, not the final
 The calibration evaluation contained 1,733 rows and 139 positive cases. AP and ROC-AUC remained unchanged after sigmoid calibration, while Brier score and ECE improved. The review zone still exceeded the 12% capacity in evaluation quarters, so the review status remains an important finding rather than a success claim.
 
 <p align="center">
-  <img src="artifacts/day4_artifacts/artifacts/reliability_curve.png" width="880" alt="Day 4 reliability curve before and after sigmoid calibration">
+  <img src="submission/project_bundle/evidence/day4/artifacts/reliability_curve.png" width="880" alt="Day 4 reliability curve before and after sigmoid calibration">
 </p>
 
 <p align="center">
-  <img src="artifacts/day4_artifacts/artifacts/shap_beeswarm.png" width="880" alt="Day 4 SHAP beeswarm plot for the class-weighted LightGBM model">
+  <img src="submission/project_bundle/evidence/day4/artifacts/shap_beeswarm.png" width="880" alt="Day 4 SHAP beeswarm plot for the class-weighted LightGBM model">
 </p>
 
 <p align="center">
-  <img src="artifacts/day4_artifacts/artifacts/shap_waterfall.png" width="880" alt="Day 4 SHAP waterfall explanation">
+  <img src="submission/project_bundle/evidence/day4/artifacts/shap_waterfall.png" width="880" alt="Day 4 SHAP waterfall explanation">
 </p>
 
 <p align="center">
-  <img src="artifacts/day4_artifacts/artifacts/permutation_importance.png" width="880" alt="Day 4 permutation importance">
+  <img src="submission/project_bundle/evidence/day4/artifacts/permutation_importance.png" width="880" alt="Day 4 permutation importance">
 </p>
 
 <p align="center">
-  <img src="artifacts/day4_artifacts/artifacts/review_zone.png" width="880" alt="Day 4 review-zone and capacity diagnostic">
+  <img src="submission/project_bundle/evidence/day4/artifacts/review_zone.png" width="880" alt="Day 4 review-zone and capacity diagnostic">
 </p>
 
 ### Day 5 — Final model and challenge batch
@@ -235,7 +235,7 @@ Logistic Regression had the best mean AP across the three forward folds (0.3917)
 
 ## Repository structure
 
-The repository is organized by purpose: notebooks contain the day-by-day analysis, root-level artifacts preserve evaluation evidence, reports summarize the final decisions, and the submission folder contains the challenge output and packaged project files.
+The repository keeps the five working notebooks and the key final outputs at the top level. The complete reproducibility bundle is stored in `submission/project_bundle/`, including the source data, day-by-day evidence, supporting scripts, reports, and presentation materials.
 
 ```text
 .
@@ -250,14 +250,12 @@ The repository is organized by purpose: notebooks contain the day-by-day analysi
 │   ├── __init__.py
 │   └── inference.py
 ├── artifacts/
-│   ├── day1_artifacts/
-│   ├── day2_artifacts/
-│   ├── day3_artifacts/
-│   ├── day4_artifacts/
-│   ├── final_model/
 │   ├── ensemble_comparison.csv
 │   ├── final_metrics.json
-│   └── final_policy.json
+│   ├── final_policy.json
+│   └── final_model/
+│       ├── model.json
+│       └── model_manifest.json
 ├── reports/
 │   ├── ENSEMBLE_DECISION.md
 │   └── MODEL_CARD.md
@@ -265,19 +263,33 @@ The repository is organized by purpose: notebooks contain the day-by-day analysi
     ├── submission.csv
     ├── submission_manifest.json
     └── project_bundle/
-        ├── artifacts/
+        ├── PROJECT_README.md
+        ├── requirements-colab.txt
+        ├── constraints.txt
         ├── data/
+        │   ├── data_contract.json
+        │   ├── data_manifest.json
+        │   ├── tamweel_train.csv
+        │   └── tamweel_challenge.csv
+        ├── evidence/
+        │   ├── day1/
+        │   ├── day2/
+        │   ├── day3/
+        │   └── day4/
         ├── notebooks/
+        ├── artifacts/
         ├── reports/
         ├── scripts/
+        ├── presentation/
         └── submission/
 ```
 
-- **notebooks/** — the five analysis notebooks, from baseline modelling through final model selection.
-- **tamweel/** — reusable inference code.
-- **artifacts/** — day-level outputs, evaluation evidence, final model files, metrics, and policy.
+- **notebooks/** — the five main analysis notebooks, from baseline modelling through final model selection.
+- **tamweel/** — reusable inference code available at the repository root.
+- **artifacts/** — the final model, model manifest, evaluation metrics, policy, and ensemble comparison.
 - **reports/** — the model card and final ensemble decision.
-- **submission/** — generated challenge predictions, manifest, and complete project bundle.
+- **submission/** — the challenge predictions, their manifest, and the complete project bundle.
+- **submission/project_bundle/** — the reproducibility package, including data contracts and datasets, Day 1–Day 4 evidence, supporting scripts, reports, notebooks, and presentation files.
 
 ## Project status
 

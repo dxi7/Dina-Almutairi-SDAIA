@@ -1,5 +1,12 @@
 """Rebuild the final course pipeline from released data and recorded configuration."""
 from pathlib import Path
+import sys
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+BUNDLE_SCRIPTS = PROJECT_ROOT / "submission" / "project_bundle" / "scripts"
+if str(BUNDLE_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(BUNDLE_SCRIPTS))
+
 import json
 import numpy as np
 import pandas as pd
@@ -9,7 +16,7 @@ from day5_final import (FinalConfig, split_final_roles, nested_comparison, worth
 
 
 def main(root=None):
-    root=Path(root) if root else Path(__file__).resolve().parents[1]
+    root=Path(root) if root else PROJECT_ROOT
     run=json.loads((root/'artifacts/day5_run.json').read_text(encoding='utf-8'))
     if run['source']!='LIVE':
         raise ValueError('Rebuild requires your live run, not a saved educational example.')

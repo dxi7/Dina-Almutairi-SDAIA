@@ -235,7 +235,9 @@ Logistic Regression had the best mean AP across the three forward folds (0.3917)
 
 ## Repository structure
 
-The repository keeps the five working notebooks and the key final outputs at the top level. The complete reproducibility bundle is stored in `submission/project_bundle/`, including the source data, day-by-day evidence, supporting scripts, reports, and presentation materials.
+This project follows a five-day workflow focused on building and evaluating a credit risk model, from baseline model development to final model selection and decision-making.
+
+The repository is organized to provide access to the analysis notebooks, datasets, supporting scripts, model artifacts, evaluation results, and documentation needed to understand and reproduce the project.
 
 ```text
 .

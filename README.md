@@ -37,7 +37,9 @@
 - [Daily answers](#daily-answers)
 - [Reproducibility](#reproducibility)
 - [Limitations](#limitations)
+- [Key project documents](#key-project-documents)
 - [Repository structure](#repository-structure)
+- [Acknowledgements](#acknowledgements)
 
 ## Project workflow
 
@@ -233,6 +235,15 @@ Logistic Regression had the best mean AP across the three forward folds (0.3917)
 - Challenge labels are unavailable. No challenge-set predictive performance or fairness claim is made.
 - A review flag means further review, not automatic rejection.
 
+## Key project documents
+
+- [Interpretability Report](reports/INTERPRETABILITY_REPORT.md) — Day 4 model explanations, calibration, stability, and review-capacity diagnostics.
+- [Ensemble Decision](reports/ENSEMBLE_DECISION.md) — final comparison and the KEEP SINGLE decision.
+- [Model Card](reports/MODEL_CARD.md) — intended use, validation, limitations, and monitoring.
+- [Final presentation (PDF)](submission/project_bundle/presentation/final_presentation.pdf) — five-slide project presentation.
+- [Presentation guide](submission/project_bundle/presentation/FINAL_PRESENTATION_GUIDE.md) — assessment criteria and presentation guidance.
+- [Five-slide presentation template](submission/project_bundle/presentation/FINAL_PRESENTATION_TEMPLATE.md) — editable outline for preparing the presentation.
+
 ## Repository structure
 
 This project follows a five-day workflow focused on building and evaluating a credit risk model, from baseline model development to final model selection and decision-making.
@@ -242,23 +253,34 @@ The repository is organized to provide access to the analysis notebooks, dataset
 ```text
 .
 ├── README.md
+├── requirements-colab.txt
+├── constraints.txt
+├── data/
+│   ├── data_contract.json
+│   ├── data_manifest.json
+│   ├── tamweel_train.csv
+│   └── tamweel_challenge.csv
 ├── notebooks/
 │   ├── 01_baseline_boosting.ipynb
 │   ├── 02_validation_tuning.ipynb
 │   ├── 03_cost_sensitive_decision.ipynb
 │   ├── 04_explain_calibrate.ipynb
-│   └── 05_final_model.ipynb
+│   ├── 05_final_model.ipynb
+│   └── 99_final_submission_check.ipynb
 ├── tamweel/
 │   ├── __init__.py
 │   └── inference.py
+├── scripts/
+│   ├── inference.py
+│   └── rebuild_final.py
 ├── artifacts/
+│   ├── final_model/
+│   ├── day5_run.json
 │   ├── ensemble_comparison.csv
 │   ├── final_metrics.json
-│   ├── final_policy.json
-│   └── final_model/
-│       ├── model.json
-│       └── model_manifest.json
+│   └── final_policy.json
 ├── reports/
+│   ├── INTERPRETABILITY_REPORT.md
 │   ├── ENSEMBLE_DECISION.md
 │   └── MODEL_CARD.md
 └── submission/
@@ -269,10 +291,6 @@ The repository is organized to provide access to the analysis notebooks, dataset
         ├── requirements-colab.txt
         ├── constraints.txt
         ├── data/
-        │   ├── data_contract.json
-        │   ├── data_manifest.json
-        │   ├── tamweel_train.csv
-        │   └── tamweel_challenge.csv
         ├── evidence/
         │   ├── day1/
         │   ├── day2/
@@ -283,15 +301,22 @@ The repository is organized to provide access to the analysis notebooks, dataset
         ├── reports/
         ├── scripts/
         ├── presentation/
+        │   ├── final_presentation.pdf
+        │   ├── FINAL_PRESENTATION_GUIDE.md
+        │   └── FINAL_PRESENTATION_TEMPLATE.md
         └── submission/
 ```
 
 - **notebooks/** — the five main analysis notebooks, from baseline modelling through final model selection.
 - **tamweel/** — reusable inference code available at the repository root.
 - **artifacts/** — the final model, model manifest, evaluation metrics, policy, and ensemble comparison.
-- **reports/** — the model card and final ensemble decision.
+- **reports/** — the interpretability report, model card, and final ensemble decision.
 - **submission/** — the challenge predictions, their manifest, and the complete project bundle.
 - **submission/project_bundle/** — the reproducibility package, including data contracts and datasets, Day 1–Day 4 evidence, supporting scripts, reports, notebooks, and presentation files.
+
+## Acknowledgements
+
+This project was completed as part of the SDA-DSC-211 learning programme at SDAIA Academy. Visit the [SDAIA Academy GitHub organization](https://github.com/SDAIAAcademy) for its public learning resources.
 
 ## Project status
 

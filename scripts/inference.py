@@ -1,8 +1,14 @@
-"""Portable final prediction entry point; apply the policy after assembling the full batch."""
+"""Portable inference entry point for the repository-root project layout."""
 from pathlib import Path
-from day5_final import predict_final
+import sys
+
+_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+
+from tamweel.inference import predict as _predict
 
 
 def predict(frame, artifact_dir=None):
-    artifact_dir=Path(artifact_dir) if artifact_dir else Path(__file__).resolve().parents[1]/'artifacts/final_model'
-    return predict_final(frame,artifact_dir)
+    """Return application IDs and model probabilities using the packaged final model."""
+    return _predict(frame, artifact_dir)

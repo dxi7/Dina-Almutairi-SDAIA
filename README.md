@@ -241,8 +241,6 @@ Logistic Regression had the best mean AP across the three forward folds (0.3917)
 - [Ensemble Decision](reports/ENSEMBLE_DECISION.md) — final comparison and the KEEP SINGLE decision.
 - [Model Card](reports/MODEL_CARD.md) — intended use, validation, limitations, and monitoring.
 - [Final presentation (PDF)](submission/project_bundle/presentation/final_presentation.pdf) — five-slide project presentation.
-- [Presentation guide](submission/project_bundle/presentation/FINAL_PRESENTATION_GUIDE.md) — assessment criteria and presentation guidance.
-- [Five-slide presentation template](submission/project_bundle/presentation/FINAL_PRESENTATION_TEMPLATE.md) — editable outline for preparing the presentation.
 
 ## Repository structure
 
@@ -301,9 +299,7 @@ The repository is organized to provide access to the analysis notebooks, dataset
         ├── reports/
         ├── scripts/
         ├── presentation/
-        │   ├── final_presentation.pdf
-        │   ├── FINAL_PRESENTATION_GUIDE.md
-        │   └── FINAL_PRESENTATION_TEMPLATE.md
+        │   └── final_presentation.pdf
         └── submission/
 ```
 
@@ -312,7 +308,7 @@ The repository is organized to provide access to the analysis notebooks, dataset
 - **artifacts/** — the final model, model manifest, evaluation metrics, policy, and ensemble comparison.
 - **reports/** — the interpretability report, model card, and final ensemble decision.
 - **submission/** — the challenge predictions, their manifest, and the complete project bundle.
-- **submission/project_bundle/** — the reproducibility package, including data contracts and datasets, Day 1–Day 4 evidence, supporting scripts, reports, notebooks, and presentation files.
+- **submission/project_bundle/** — the reproducibility package, including data contracts and datasets, Day 1–Day 4 evidence, supporting scripts, reports, notebooks, and the final PDF presentation.
 
 ## Acknowledgements
 
